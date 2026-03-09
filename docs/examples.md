@@ -1,4 +1,4 @@
 # Examples
 
-- [Basic Flow](basic_flow.md)
-- [Agentic Flow](agentic_flow.md)
+- [Basic Flow](examples/basic_flow.md)
+- [Agentic Flow](examples/agentic_flow.md)
