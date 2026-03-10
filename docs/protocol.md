@@ -1,6 +1,6 @@
 # JSON-RPC Interception Protocol
 
-## 1. Scope
+## Scope
 
 This protocol defines deterministic orchestration of:
 
@@ -14,7 +14,7 @@ using **JSON-RPC 2.0** messages.
 
 All semantics are expressed through valid RPC requests and responses.
 
-## 2. Architecture Overview
+## Architecture Overview
 
 ```mermaid
 ---
@@ -31,7 +31,7 @@ flowchart TB
     A --> B --> C --> D --> E --> F
 ```
 
-## 3. Core Components
+## Core Components
 
 ### Orchestrator
 
@@ -56,7 +56,7 @@ Interceptors never:
 - directly execute tools
 - reorder pipelines
 
-## 4. Interceptor Pipelines
+## Interceptor Pipelines
 
 Orchestrator maintains **two independent pipelines**:
 
@@ -102,7 +102,7 @@ outbound | inbound | both
 - executed_actions
   - only when there is an action made
 
-## 5. Interception RPC Contract
+## Interception RPC Contract
 
 **Orchestrator → Interceptor Request** (Outbound)
 
@@ -138,7 +138,7 @@ outbound | inbound | both
 }
 ```
 
-## 6. Interceptor Response Contract
+## Interceptor Response Contract
 
 **Interceptor → Orchestrator**
 
@@ -150,7 +150,7 @@ outbound | inbound | both
 }
 ```
 
-## 7. Action Object Format
+## Action Object Format
 
 ```json
 {
@@ -166,7 +166,7 @@ outbound | inbound | both
 - Action does not encode flow control.
 - Action is pure data.
 
-## 10. Execution Model
+## Execution Model
 
 Per phase:
 
@@ -186,7 +186,7 @@ flowchart LR
     MORE -- No --> STOP([Stop phase])
 ```
 
-## 11. Observability
+## Observability
 
 Orchestrator records append-only transcript every message is between
 
@@ -200,7 +200,7 @@ Interceptors may not mutate it.
 
 see [Transcript](canonical_actions.md#get_transcript)
 
-## 14. Compliance
+## Compliance
 
 All messages conform to JSON-RPC 2.0
 
