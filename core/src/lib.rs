@@ -7,6 +7,7 @@ pub mod interceptor_capabilities;
 pub mod interceptor_policy;
 pub mod interceptor_state;
 pub mod json_rpc;
+pub mod next_jsonrpc_id;
 pub mod participant;
 pub mod phase;
 pub mod transcript;

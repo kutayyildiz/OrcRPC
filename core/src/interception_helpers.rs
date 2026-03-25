@@ -2,15 +2,7 @@ use crate::{
     interception::{InterceptionDecision, InterceptionRequest},
     json_rpc::{JsonRpcRequest, JsonRpcResponse},
 };
-use serde_json::Value;
-use std::sync::atomic::{AtomicU64, Ordering};
 
-static NEXT_ID: AtomicU64 = AtomicU64::new(1);
-
-/// Generates a collision-free JSON-RPC id (u64 → Number).
-/// Thread-safe, deterministic within the process, perfect for tests + replay.
-pub fn new_jsonrpc_id() -> Value {
-    Value::Number(NEXT_ID.fetch_add(1, Ordering::Relaxed).into())
 }
 
 /// Orchestrator → Interceptor  
