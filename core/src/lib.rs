@@ -1,6 +1,6 @@
-pub mod action;
+pub mod action_kind;
+pub mod actions;
 pub mod error;
-pub mod executed_action;
 pub mod interception;
 pub mod interception_helpers;
 pub mod interceptor_capabilities;
@@ -10,4 +10,9 @@ pub mod json_rpc;
 pub mod next_jsonrpc_id;
 pub mod participant;
 pub mod phase;
+pub mod requested_action;
+pub mod requested_action_record;
+pub mod resolved_action;
+pub mod resolved_action_record;
+pub mod traits;
 pub mod transcript;
