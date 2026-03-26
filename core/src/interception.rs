@@ -18,12 +18,8 @@ impl InterceptionRequest {
             .is_some_and(|actions| !actions.is_empty())
     }
 
-    pub fn phase(&self) -> Phase {
-        if matches!(self.message, JsonRpcMessage::Response(_)) {
-            Phase::Inbound
-        } else {
-            Phase::Outbound
-        }
+    pub fn phase(&self) -> Result<Phase, &'static str> {
+        self.message.phase()
     }
 }
 
