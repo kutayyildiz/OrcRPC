@@ -1,5 +1,7 @@
-use super::resolved_action::ResolvedAction;
-use crate::{action_kind::ActionKind, error::ActionError, traits::ActionSpec};
+use crate::{
+    action::{ActionKind, ActionSpec, ResolvedAction},
+    error::ActionError,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 

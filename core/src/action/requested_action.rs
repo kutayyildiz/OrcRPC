@@ -1,5 +1,6 @@
 use crate::{
-    error::CodecError, requested_action_record::RequestedActionRecord, traits::ActionSpec,
+    action::{ActionSpec, RequestedActionRecord},
+    error::CodecError,
 };
 
 #[derive(Debug, Clone, PartialEq)]

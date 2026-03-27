@@ -1,4 +1,4 @@
-use crate::{action_kind::ActionKind, requested_action_record::RequestedActionRecord};
+use crate::action::{ActionKind, RequestedActionRecord};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 

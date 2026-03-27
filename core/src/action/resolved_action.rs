@@ -1,6 +1,7 @@
-use super::resolved_action_record::ResolvedActionRecord;
-use crate::error::{ActionError, CodecError};
-use crate::traits::ActionSpec;
+use crate::{
+    action::{ActionSpec, ResolvedActionRecord},
+    error::{ActionError, CodecError},
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ResolvedAction<A: ActionSpec> {

@@ -1,23 +1,9 @@
-use serde::{Serialize, de::DeserializeOwned};
-
 use crate::{
-    action_kind::ActionKind,
+    action::ResolvedActionRecord,
     error::ActionError,
     interception::{InterceptionRequest, InterceptionResponse},
     json_rpc::JsonRpcMessage,
-    resolved_action_record::ResolvedActionRecord,
 };
-
-pub trait ActionSpec {
-    type Params: Serialize + DeserializeOwned;
-    type Result: Serialize + DeserializeOwned;
-
-    const KIND: ActionKind;
-}
-
-pub trait ActionExecutor<A: ActionSpec> {
-    fn execute(&self, params: A::Params) -> Result<A::Result, ActionError>;
-}
 
 pub trait InterceptionHandler {
     fn handle(&self, req: &InterceptionRequest) -> Result<InterceptionResponse, ActionError> {
