@@ -42,8 +42,7 @@ impl JsonRpcMessage {
                 match (all_inbound, all_outbound) {
                     (true, false) => Ok(Phase::Inbound),
                     (false, true) => Ok(Phase::Outbound),
-                    (false, false) => Err("mixed JSON-RPC batch is invalid"),
-                    (true, true) => Err("empty JSON-RPC batch is invalid"),
+                    _ => Err("mixed JSON-RPC batch is invalid"),
                 }
             }
         }
