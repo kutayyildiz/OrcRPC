@@ -1,5 +1,6 @@
 use crate::{
-    action::ResolvedActionRecord, json_rpc::JsonRpcMessage, participant::Participant, phase::Phase,
+    action::ResolvedActionRecord, interception::InterceptionPhase, json_rpc::JsonRpcMessage,
+    participant::Participant,
 };
 use serde::{Deserialize, Serialize};
 
@@ -18,7 +19,7 @@ impl InterceptionRequest {
             .is_some_and(|actions| !actions.is_empty())
     }
 
-    pub fn phase(&self) -> Result<Phase, &'static str> {
+    pub fn phase(&self) -> Result<InterceptionPhase, &'static str> {
         self.message.phase()
     }
 }

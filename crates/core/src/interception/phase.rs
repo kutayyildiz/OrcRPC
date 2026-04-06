@@ -1,14 +1,15 @@
 use crate::json_rpc::{JsonRpcMessage, JsonRpcSingleMessage};
 use serde::{Deserialize, Serialize};
+use strum::Display;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Display)]
 #[serde(rename_all = "lowercase")]
-pub enum Phase {
+pub enum InterceptionPhase {
     Outbound,
     Inbound,
 }
 
-impl Phase {
+impl InterceptionPhase {
     pub fn is_outbound(self) -> bool {
         matches!(self, Self::Outbound)
     }
@@ -18,13 +19,15 @@ impl Phase {
 }
 
 impl JsonRpcMessage {
-    pub fn phase(&self) -> Result<Phase, &'static str> {
+    pub fn phase(&self) -> Result<InterceptionPhase, &'static str> {
         match self {
-            JsonRpcMessage::Single(JsonRpcSingleMessage::Response(_)) => Ok(Phase::Inbound),
+            JsonRpcMessage::Single(JsonRpcSingleMessage::Response(_)) => {
+                Ok(InterceptionPhase::Inbound)
+            }
 
             JsonRpcMessage::Single(
                 JsonRpcSingleMessage::Request(_) | JsonRpcSingleMessage::Notification(_),
-            ) => Ok(Phase::Outbound),
+            ) => Ok(InterceptionPhase::Outbound),
 
             JsonRpcMessage::Batch(batch) => {
                 let all_inbound = batch
@@ -40,8 +43,8 @@ impl JsonRpcMessage {
                 });
 
                 match (all_inbound, all_outbound) {
-                    (true, false) => Ok(Phase::Inbound),
-                    (false, true) => Ok(Phase::Outbound),
+                    (true, false) => Ok(InterceptionPhase::Inbound),
+                    (false, true) => Ok(InterceptionPhase::Outbound),
                     _ => Err("mixed JSON-RPC batch is invalid"),
                 }
             }
