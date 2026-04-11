@@ -1,8 +1,9 @@
 use crate::json_rpc::{JsonRpcMessage, JsonRpcSingleMessage};
 use serde::{Deserialize, Serialize};
+use std::hash::Hash;
 use strum::Display;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Display)]
 #[serde(rename_all = "lowercase")]
 pub enum InterceptionPhase {
     Outbound,

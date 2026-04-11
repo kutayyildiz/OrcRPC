@@ -1,20 +1,30 @@
 use crate::action::RequestedActionRecord;
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum InterceptorContinuation {
+    Reinvoke,
+    Stop,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct InterceptionResponse {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub actions: Option<Vec<RequestedActionRecord>>,
-    pub is_final: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub actions: Vec<RequestedActionRecord>,
+    pub continuation: InterceptorContinuation,
 }
 
 impl InterceptionResponse {
     pub fn has_actions(&self) -> bool {
-        self.actions
-            .as_ref()
-            .is_some_and(|actions| !actions.is_empty())
+        !self.actions.is_empty()
     }
-    pub fn is_final(&self) -> bool {
-        self.is_final || !self.has_actions()
+
+    pub fn should_reinvoke(&self) -> bool {
+        matches!(self.continuation, InterceptorContinuation::Reinvoke)
+    }
+
+    pub fn should_stop(&self) -> bool {
+        matches!(self.continuation, InterceptorContinuation::Stop)
     }
 }
