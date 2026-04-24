@@ -1,19 +1,11 @@
-use actrpc_core::{
-    action::{RequestedActionRecord, ResolvedActionRecord},
-    error::ActionExecutionError,
-    interception::InterceptionRequest,
-};
+mod action_handler;
+mod action_registry;
+mod registered_action_handler;
+mod typed_action_handler;
 
-pub trait ActionExecutor: Send + Sync {
-    fn kind(&self) -> &str;
+pub mod actions;
 
-    fn execute(
-        &self,
-        request: &InterceptionRequest,
-        action: RequestedActionRecord,
-    ) -> Result<ResolvedActionRecord, ActionExecutionError>;
-}
-
-pub trait ActionRegistry {
-    fn get_executor<'a>(&'a self, kind: &str) -> Option<&'a dyn ActionExecutor>;
-}
+pub use action_handler::ActionHandler;
+pub use action_registry::ActionRegistry;
+pub use registered_action_handler::RegisteredActionHandler;
+pub use typed_action_handler::TypedActionHandler;
