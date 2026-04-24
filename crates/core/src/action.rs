@@ -5,11 +5,11 @@ mod resolved_action;
 mod resolved_action_record;
 mod spec;
 
-pub use kind::ActionKind;
-pub use spec::ActionSpec;
+pub mod action_descriptor;
 
+pub use kind::ActionKind;
 pub use requested_action::RequestedAction;
 pub use requested_action_record::RequestedActionRecord;
-
 pub use resolved_action::ResolvedAction;
 pub use resolved_action_record::ResolvedActionRecord;
+pub use spec::{ActionSpec, NoOk, NoParams};
