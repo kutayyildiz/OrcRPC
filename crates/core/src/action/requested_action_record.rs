@@ -6,7 +6,8 @@ use crate::action::{ActionKind, ActionSpec, RequestedAction};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RequestedActionRecord {
     pub kind: ActionKind,
-    pub params: Value,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub params: Option<Value>,
 }
 
 impl<A> TryFrom<RequestedAction<A>> for RequestedActionRecord
@@ -18,7 +19,7 @@ where
     fn try_from(value: RequestedAction<A>) -> Result<Self, Self::Error> {
         Ok(Self {
             kind: A::KIND.into(),
-            params: serde_json::to_value(value.params)?,
+            params: Some(serde_json::to_value(value.params)?),
         })
     }
 }

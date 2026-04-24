@@ -1,29 +1,32 @@
+use actrpc_core_macros::DescribeValue;
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, DescribeValue)]
 #[serde(transparent)]
-pub struct ActionKind(String);
+pub struct ActionKind {
+    name: String,
+}
 
 impl ActionKind {
     pub fn new(value: impl Into<String>) -> Self {
-        Self(value.into())
+        Self { name: value.into() }
     }
 
     pub fn as_str(&self) -> &str {
-        &self.0
+        &self.name
     }
 
-    pub fn into_inner(self) -> String {
-        self.0
+    pub fn into_string(self) -> String {
+        self.name
     }
 }
 
 impl fmt::Display for ActionKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
+        self.name.fmt(f)
     }
 }
 
@@ -41,25 +44,25 @@ impl Borrow<str> for ActionKind {
 
 impl From<String> for ActionKind {
     fn from(value: String) -> Self {
-        Self(value)
+        Self::new(value)
     }
 }
 
 impl From<&str> for ActionKind {
     fn from(value: &str) -> Self {
-        Self(value.to_owned())
+        Self::new(value)
     }
 }
 
 impl From<ActionKind> for String {
     fn from(value: ActionKind) -> Self {
-        value.0
+        value.name
     }
 }
 
 impl From<&ActionKind> for String {
     fn from(value: &ActionKind) -> Self {
-        value.0.clone()
+        value.as_str().to_owned()
     }
 }
 

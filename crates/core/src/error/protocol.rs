@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[non_exhaustive]
-#[derive(Debug, thiserror::Error, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, thiserror::Error, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ProtocolError {
     #[error("expected method {expected}, got {actual}")]
     UnexpectedMethod { expected: String, actual: String },

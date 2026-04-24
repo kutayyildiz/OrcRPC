@@ -3,6 +3,7 @@ use crate::{
     error::ActionCodecError,
 };
 
+/// A request from an interceptor for the orchestrator to consider executing.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RequestedAction<A: ActionSpec> {
     pub params: A::Params,
@@ -13,17 +14,26 @@ where
     A: ActionSpec,
 {
     fn decode_from_record(value: &RequestedActionRecord) -> Result<Self, ActionCodecError> {
-        if value.kind != A::KIND.into() {
+        let expected = A::action_kind();
+
+        if value.kind != expected {
             return Err(ActionCodecError::KindMismatch {
-                expected: A::KIND.into(),
+                expected,
                 actual: value.kind.clone(),
             });
         }
 
-        let params = serde_json::from_value(value.params.clone()).map_err(|e| {
+        let raw_params = value
+            .params
+            .clone()
+            .ok_or_else(|| ActionCodecError::MissingParams {
+                action: value.kind.clone(),
+            })?;
+
+        let params = serde_json::from_value(raw_params).map_err(|source| {
             ActionCodecError::InvalidParams {
-                action: A::KIND.into(),
-                source: e,
+                action: value.kind.clone(),
+                source,
             }
         })?;
 

@@ -1,6 +1,6 @@
 use crate::{
     action::{ActionKind, ActionSpec, ResolvedAction},
-    error::ActionExecutionError,
+    error::ProtocolError,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -8,8 +8,9 @@ use serde_json::Value;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ResolvedActionRecord {
     pub kind: ActionKind,
-    pub params: Value,
-    pub result: Result<Value, ActionExecutionError>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub params: Option<Value>,
+    pub result: Result<Option<Value>, ProtocolError>,
 }
 
 impl<A> TryFrom<ResolvedAction<A>> for ResolvedActionRecord
@@ -22,10 +23,10 @@ where
 
     fn try_from(value: ResolvedAction<A>) -> Result<Self, Self::Error> {
         Ok(Self {
-            kind: A::KIND.into(),
-            params: serde_json::to_value(value.params)?,
+            kind: A::action_kind(),
+            params: Some(serde_json::to_value(value.params)?),
             result: match value.result {
-                Ok(ok) => Ok(serde_json::to_value(ok)?),
+                Ok(ok) => Ok(Some(serde_json::to_value(ok)?)),
                 Err(err) => Err(err),
             },
         })

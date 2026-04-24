@@ -34,7 +34,9 @@ impl TryFrom<JsonRpcResponse> for (JsonRpcId, InterceptionResponse) {
         match resp {
             JsonRpcResponse::Success(success) => {
                 let payload: InterceptionResponse = serde_json::from_value(success.result)
-                    .map_err(|e| ActRpcError::Codec(CodecError::Deserialize(e.to_string())))?;
+                    .map_err(|source| {
+                        ActRpcError::Codec(CodecError::Deserialize(source.to_string()))
+                    })?;
 
                 Ok((success.id, payload))
             }
@@ -50,10 +52,10 @@ impl TryFrom<JsonRpcRequest> for (JsonRpcId, InterceptionRequest) {
     fn try_from(req: JsonRpcRequest) -> Result<Self, Self::Error> {
         if req.method != INTERCEPT_METHOD {
             return Err(ActRpcError::Protocol(ProtocolError::UnexpectedMethod {
-                expected: (INTERCEPT_METHOD.to_string()),
-                actual: (req.method),
+                expected: INTERCEPT_METHOD.to_string(),
+                actual: req.method,
             }));
-        };
+        }
 
         let params = match req.params {
             Some(JsonRpcParams::Object(map)) => map,
@@ -63,11 +65,12 @@ impl TryFrom<JsonRpcRequest> for (JsonRpcId, InterceptionRequest) {
         };
 
         let payload = serde_json::from_value(serde_json::Value::Object(params))
-            .map_err(|e| ActRpcError::Codec(CodecError::Deserialize(e.to_string())))?;
+            .map_err(|source| ActRpcError::Codec(CodecError::Deserialize(source.to_string())))?;
 
         Ok((req.id, payload))
     }
 }
+
 impl From<(JsonRpcId, InterceptionResponse)> for JsonRpcResponse {
     fn from((id, resp): (JsonRpcId, InterceptionResponse)) -> Self {
         let result =

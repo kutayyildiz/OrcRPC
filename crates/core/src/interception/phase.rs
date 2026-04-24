@@ -1,4 +1,7 @@
-use crate::json_rpc::{JsonRpcMessage, JsonRpcSingleMessage};
+use crate::{
+    error::ProtocolError,
+    json_rpc::{JsonRpcMessage, JsonRpcSingleMessage},
+};
 use serde::{Deserialize, Serialize};
 use std::hash::Hash;
 use strum::Display;
@@ -14,13 +17,14 @@ impl InterceptionPhase {
     pub fn is_outbound(self) -> bool {
         matches!(self, Self::Outbound)
     }
+
     pub fn is_inbound(self) -> bool {
         matches!(self, Self::Inbound)
     }
 }
 
 impl JsonRpcMessage {
-    pub fn phase(&self) -> Result<InterceptionPhase, &'static str> {
+    pub fn phase(&self) -> Result<InterceptionPhase, ProtocolError> {
         match self {
             JsonRpcMessage::Single(JsonRpcSingleMessage::Response(_)) => {
                 Ok(InterceptionPhase::Inbound)
@@ -46,7 +50,7 @@ impl JsonRpcMessage {
                 match (all_inbound, all_outbound) {
                     (true, false) => Ok(InterceptionPhase::Inbound),
                     (false, true) => Ok(InterceptionPhase::Outbound),
-                    _ => Err("mixed JSON-RPC batch is invalid"),
+                    _ => Err(ProtocolError::MixedBatch),
                 }
             }
         }
