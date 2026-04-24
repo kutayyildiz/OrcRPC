@@ -1,6 +1,6 @@
-use actrpc_core::error::ActionExecutionError;
 use actrpc_core::{
     action::{ActionKind, RequestedActionRecord, ResolvedActionRecord},
+    error::ProtocolError,
     interception::{
         InterceptionPhase, InterceptionRequest, InterceptionResponse, InterceptorContinuation,
     },
@@ -140,7 +140,7 @@ fn test_interception_request_phase_detection_batch_mixed_is_invalid() {
         prior_actions: vec![],
     };
 
-    assert_eq!(req.phase(), Err("mixed JSON-RPC batch is invalid"));
+    assert_eq!(req.phase(), Err(ProtocolError::MixedBatch));
 }
 
 #[test]
@@ -158,9 +158,9 @@ fn test_interception_request_has_prior_actions() {
         })),
         prior_actions: vec![ResolvedActionRecord {
             kind: ActionKind::from("log"),
-            params: json!({ "message": "checked" }),
-            result: Err(ActionExecutionError::Internal {
-                message: "noop".to_string(),
+            params: Some(json!({ "message": "checked" })),
+            result: Err(ProtocolError::InvalidMessageDirection {
+                reason: "noop".to_string(),
             }),
         }],
     };
@@ -213,7 +213,7 @@ fn test_interception_response_helpers_with_actions() {
     let response = InterceptionResponse {
         actions: vec![RequestedActionRecord {
             kind: ActionKind::from("notify"),
-            params: json!({ "channel": "audit" }),
+            params: Some(json!({ "channel": "audit" })),
         }],
         continuation: InterceptorContinuation::Reinvoke,
     };

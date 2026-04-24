@@ -96,7 +96,7 @@ fn test_interception_response_into_json_rpc_response() {
     let payload = InterceptionResponse {
         actions: vec![RequestedActionRecord {
             kind: ActionKind::from("log"),
-            params: json!({ "message": "ok" }),
+            params: Some(json!({ "message": "ok" })),
         }],
         continuation: InterceptorContinuation::Reinvoke,
     };
@@ -125,10 +125,10 @@ fn test_json_rpc_response_try_into_interception_response_returns_remote_error() 
     let err = <(JsonRpcId, InterceptionResponse)>::try_from(resp).unwrap_err();
 
     match err {
-        ActRpcError::RemoteJsonRpc(err) => {
-            assert_eq!(err.code, -32000);
-            assert_eq!(err.message, "boom");
-            assert_eq!(err.data, Some(json!({ "detail": "failed" })));
+        ActRpcError::RemoteJsonRpc(error) => {
+            assert_eq!(error.code, -32000);
+            assert_eq!(error.message, "boom");
+            assert_eq!(error.data, Some(json!({ "detail": "failed" })));
         }
         other => panic!("unexpected error: {other:?}"),
     }
