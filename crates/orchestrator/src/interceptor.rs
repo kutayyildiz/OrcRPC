@@ -1,24 +1,7 @@
-use actrpc_core::{
-    interception::InterceptionPhase,
-    interceptor::{InterceptorCapabilities, InterceptorPolicy},
-};
-use actrpc_transport::TransportTarget;
+mod config;
+mod traits;
 
-pub trait InterceptorRegistry {
-    type Error;
+pub mod initialization;
 
-    fn interceptors_for_phase(
-        &self,
-        phase: InterceptionPhase,
-    ) -> Result<Vec<InterceptorEntry>, Self::Error>;
-}
-
-#[derive(Debug, Clone)]
-pub struct InterceptorEntry {
-    pub name: String,
-    pub target: TransportTarget,
-    pub capabilities: InterceptorCapabilities,
-    pub policy: Option<InterceptorPolicy>,
-    pub priority: i32,
-    pub enabled: bool,
-}
+pub use config::InterceptorConfig;
+pub use traits::Interceptor;
