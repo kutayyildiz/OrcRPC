@@ -1,10 +1,10 @@
 use crate::{
     error::{InterceptorError, OrchestratorError},
-    runtime::interceptor::InterceptorPolicy,
+    interceptor::InterceptorPolicy,
 };
 use actrpc_core::{
     InterceptorInitialization,
-    action::{ActionKind, action_descriptor::types::ActionDescriptor},
+    action::{ActionDescriptor, ActionKind},
 };
 use std::collections::HashMap;
 

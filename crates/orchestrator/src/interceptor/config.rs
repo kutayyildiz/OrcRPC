@@ -1,4 +1,4 @@
-use crate::runtime::interceptor::InterceptorPolicy;
+use crate::interceptor::InterceptorPolicy;
 use actrpc_transport::TransportTarget;
 use serde::{Deserialize, Serialize};
 

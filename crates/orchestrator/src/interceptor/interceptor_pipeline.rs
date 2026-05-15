@@ -46,6 +46,14 @@ impl WorkingInterceptorPipeline {
             .clone()
     }
 
+    pub fn contains(&self, name: &str) -> bool {
+        self.interceptors
+            .read()
+            .expect("poisoned working pipeline lock")
+            .iter()
+            .any(|current| current == name)
+    }
+
     pub fn exclude_named(&self, names: &[String]) {
         if names.is_empty() {
             return;
