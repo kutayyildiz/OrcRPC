@@ -5,6 +5,7 @@ mod interceptor_capabilities;
 mod interceptor_initialization;
 
 pub mod action;
+pub mod descriptor;
 pub mod error;
 pub mod interception;
 pub mod json_rpc;

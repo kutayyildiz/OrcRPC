@@ -1,6 +1,6 @@
-use crate::action::{
-    ActionSpec,
-    action_descriptor::types::{ActionDescriptor, OkDescriptor, ParamsDescriptor, ValueDescriptor},
+use crate::{
+    action::{ActionDescriptor, ActionSpec},
+    descriptor::types::{OkDescriptor, ParamsDescriptor, ValueDescriptor},
 };
 
 pub trait DescribeValue {

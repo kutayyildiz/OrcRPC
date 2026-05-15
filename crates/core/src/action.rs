@@ -1,3 +1,4 @@
+mod action_descriptor;
 mod kind;
 mod requested_action;
 mod requested_action_record;
@@ -5,8 +6,7 @@ mod resolved_action;
 mod resolved_action_record;
 mod spec;
 
-pub mod action_descriptor;
-
+pub use action_descriptor::ActionDescriptor;
 pub use kind::ActionKind;
 pub use requested_action::RequestedAction;
 pub use requested_action_record::RequestedActionRecord;

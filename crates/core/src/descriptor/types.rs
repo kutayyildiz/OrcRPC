@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::action::ActionKind;
-
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
 pub enum PrimitiveDescriptor {
     Null,
@@ -45,10 +43,3 @@ pub enum ParamsDescriptor {
 }
 
 pub type OkDescriptor = ValueDescriptor;
-
-#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq)]
-pub struct ActionDescriptor {
-    pub kind: ActionKind,
-    pub params: Option<ParamsDescriptor>,
-    pub ok: Option<OkDescriptor>,
-}

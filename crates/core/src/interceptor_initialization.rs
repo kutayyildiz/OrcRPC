@@ -1,4 +1,4 @@
-use crate::action::{ActionKind, action_descriptor::ActionDescriptor};
+use crate::action::{ActionDescriptor, ActionKind};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

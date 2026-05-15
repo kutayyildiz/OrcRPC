@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use actrpc_core::{
     DescribeParams, DescribeValue,
-    action::action_descriptor::{
+    descriptor::{
         traits::{DescribeParams as _, DescribeValue as _},
         types::{ParamsDescriptor, PrimitiveDescriptor, ValueDescriptor},
     },

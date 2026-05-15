@@ -1,4 +1,3 @@
-// crates/core_macros/src/describe_value.rs
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Error, Fields, parse_macro_input};
@@ -30,8 +29,8 @@ fn expand_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     };
 
     Ok(quote! {
-        impl ::actrpc_core::action::action_descriptor::traits::DescribeValue for #ident {
-            fn describe_value() -> ::actrpc_core::action::action_descriptor::types::ValueDescriptor {
+        impl ::actrpc_core::descriptor::traits::DescribeValue for #ident {
+            fn describe_value() -> ::actrpc_core::descriptor::types::ValueDescriptor {
                 #body
             }
         }
@@ -49,7 +48,7 @@ fn describe_struct_value(input: &DeriveInput) -> syn::Result<proc_macro2::TokenS
             let ty = value_descriptor_tokens(&field.ty, false)?;
 
             Ok(quote! {
-                ::actrpc_core::action::action_descriptor::types::FieldDescriptor {
+                ::actrpc_core::descriptor::types::FieldDescriptor {
                     name: #name.to_string(),
                     ty: #ty,
                 }
@@ -58,8 +57,8 @@ fn describe_struct_value(input: &DeriveInput) -> syn::Result<proc_macro2::TokenS
         .collect::<syn::Result<Vec<_>>>()?;
 
     Ok(quote! {
-        ::actrpc_core::action::action_descriptor::types::ValueDescriptor::Object(
-            ::actrpc_core::action::action_descriptor::types::NestedObjectDescriptor {
+        ::actrpc_core::descriptor::types::ValueDescriptor::Object(
+            ::actrpc_core::descriptor::types::NestedObjectDescriptor {
                 fields: vec![#(#field_tokens),*],
             }
         )
@@ -99,7 +98,7 @@ fn describe_enum_value(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStr
         .collect::<syn::Result<Vec<_>>>()?;
 
     Ok(quote! {
-        ::actrpc_core::action::action_descriptor::types::ValueDescriptor::OneOf(
+        ::actrpc_core::descriptor::types::ValueDescriptor::OneOf(
             vec![#(#variant_tokens),*]
         )
     })

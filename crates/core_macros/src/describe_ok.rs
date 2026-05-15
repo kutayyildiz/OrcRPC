@@ -34,7 +34,7 @@ fn expand_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
             let ty = value_descriptor_tokens(&field.ty, false)?;
 
             Ok(quote! {
-                ::actrpc_core::action::action_descriptor::types::FieldDescriptor {
+                ::actrpc_core::descriptor::types::FieldDescriptor {
                     name: #name.to_string(),
                     ty: #ty,
                 }
@@ -43,13 +43,13 @@ fn expand_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         .collect::<syn::Result<Vec<_>>>()?;
 
     Ok(quote! {
-        impl ::actrpc_core::action::action_descriptor::traits::DescribeOk for #ident {
+        impl ::actrpc_core::descriptor::traits::DescribeOk for #ident {
             fn describe_ok() -> Option<
-                ::actrpc_core::action::action_descriptor::types::OkDescriptor
+                ::actrpc_core::descriptor::types::OkDescriptor
             > {
                 Some(
-                    ::actrpc_core::action::action_descriptor::types::ValueDescriptor::Object(
-                        ::actrpc_core::action::action_descriptor::types::NestedObjectDescriptor {
+                    ::actrpc_core::descriptor::types::ValueDescriptor::Object(
+                        ::actrpc_core::descriptor::types::NestedObjectDescriptor {
                             fields: vec![#(#field_tokens),*],
                         }
                     )

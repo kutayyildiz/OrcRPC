@@ -147,23 +147,23 @@ fn primitive_descriptor_tokens(ty: &Type) -> Option<TokenStream> {
     let ident = &path.segments.last()?.ident;
     let primitive = match ident.to_string().as_str() {
         "bool" => quote! {
-            ::actrpc_core::action::action_descriptor::types::PrimitiveDescriptor::Bool
+            ::actrpc_core::descriptor::types::PrimitiveDescriptor::Bool
         },
         "String" => quote! {
-            ::actrpc_core::action::action_descriptor::types::PrimitiveDescriptor::String
+            ::actrpc_core::descriptor::types::PrimitiveDescriptor::String
         },
         "u8" | "u16" | "u32" | "u64" | "u128" | "usize" | "i8" | "i16" | "i32" | "i64" | "i128"
         | "isize" => quote! {
-            ::actrpc_core::action::action_descriptor::types::PrimitiveDescriptor::Integer
+            ::actrpc_core::descriptor::types::PrimitiveDescriptor::Integer
         },
         "f32" | "f64" => quote! {
-            ::actrpc_core::action::action_descriptor::types::PrimitiveDescriptor::Number
+            ::actrpc_core::descriptor::types::PrimitiveDescriptor::Number
         },
         _ => return None,
     };
 
     Some(quote! {
-        ::actrpc_core::action::action_descriptor::types::ValueDescriptor::Primitive(#primitive)
+        ::actrpc_core::descriptor::types::ValueDescriptor::Primitive(#primitive)
     })
 }
 
@@ -194,7 +194,7 @@ pub fn value_descriptor_tokens(ty: &Type, allow_option: bool) -> Result<TokenStr
 
     if is_serde_json_value(ty) {
         return Ok(quote! {
-            ::actrpc_core::action::action_descriptor::types::ValueDescriptor::Any
+            ::actrpc_core::descriptor::types::ValueDescriptor::Any
         });
     }
 
@@ -205,7 +205,7 @@ pub fn value_descriptor_tokens(ty: &Type, allow_option: bool) -> Result<TokenStr
     if let Some(inner) = is_vec(ty) {
         let inner_tokens = value_descriptor_tokens(inner, false)?;
         return Ok(quote! {
-            ::actrpc_core::action::action_descriptor::types::ValueDescriptor::Array(
+            ::actrpc_core::descriptor::types::ValueDescriptor::Array(
                 Box::new(#inner_tokens)
             )
         });
@@ -214,13 +214,13 @@ pub fn value_descriptor_tokens(ty: &Type, allow_option: bool) -> Result<TokenStr
     if let Some(inner) = is_map(ty) {
         let inner_tokens = value_descriptor_tokens(inner, false)?;
         return Ok(quote! {
-            ::actrpc_core::action::action_descriptor::types::ValueDescriptor::Map(
+            ::actrpc_core::descriptor::types::ValueDescriptor::Map(
                 Box::new(#inner_tokens)
             )
         });
     }
 
     Ok(quote! {
-        <#ty as ::actrpc_core::action::action_descriptor::traits::DescribeValue>::describe_value()
+        <#ty as ::actrpc_core::descriptor::traits::DescribeValue>::describe_value()
     })
 }

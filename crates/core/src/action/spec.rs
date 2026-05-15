@@ -1,12 +1,8 @@
-use serde::{Serialize, de::DeserializeOwned};
-
-use crate::action::{
-    ActionKind,
-    action_descriptor::{
-        traits::{DescribeOk, DescribeParams},
-        types::ActionDescriptor,
-    },
+use crate::{
+    action::{ActionDescriptor, ActionKind},
+    descriptor::traits::{DescribeOk, DescribeParams},
 };
+use serde::{Serialize, de::DeserializeOwned};
 
 pub trait ActionSpec {
     type Params: Serialize + DeserializeOwned + DescribeParams;

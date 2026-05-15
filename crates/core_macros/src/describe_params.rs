@@ -28,7 +28,7 @@ fn expand_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         if let Some(inner) = is_option(&field.ty) {
             let ty = value_descriptor_tokens(inner, false)?;
             optional.push(quote! {
-                ::actrpc_core::action::action_descriptor::types::FieldDescriptor {
+                ::actrpc_core::descriptor::types::FieldDescriptor {
                     name: #name.to_string(),
                     ty: #ty,
                 }
@@ -36,7 +36,7 @@ fn expand_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
         } else {
             let ty = value_descriptor_tokens(&field.ty, false)?;
             required.push(quote! {
-                ::actrpc_core::action::action_descriptor::types::FieldDescriptor {
+                ::actrpc_core::descriptor::types::FieldDescriptor {
                     name: #name.to_string(),
                     ty: #ty,
                 }
@@ -45,13 +45,13 @@ fn expand_impl(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     }
 
     Ok(quote! {
-        impl ::actrpc_core::action::action_descriptor::traits::DescribeParams for #ident {
+        impl ::actrpc_core::descriptor::traits::DescribeParams for #ident {
             fn describe_params() -> Option<
-                ::actrpc_core::action::action_descriptor::types::ParamsDescriptor
+                ::actrpc_core::descriptor::types::ParamsDescriptor
             > {
                 Some(
-                    ::actrpc_core::action::action_descriptor::types::ParamsDescriptor::Object(
-                        ::actrpc_core::action::action_descriptor::types::ParamsObjectDescriptor {
+                    ::actrpc_core::descriptor::types::ParamsDescriptor::Object(
+                        ::actrpc_core::descriptor::types::ParamsObjectDescriptor {
                             required_fields: vec![#(#required),*],
                             optional_fields: vec![#(#optional),*],
                         }
