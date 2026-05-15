@@ -4,6 +4,7 @@ use actrpc_transport::TransportError;
 mod action;
 mod action_execution;
 mod action_handler;
+mod config;
 mod external_method_error;
 mod interceptor;
 mod interceptor_runtime;
@@ -11,6 +12,7 @@ mod interceptor_runtime;
 pub use action::ActionError;
 pub use action_execution::ActionExecutionError;
 pub use action_handler::ActionHandlerError;
+pub use config::ConfigError;
 pub use external_method_error::ExternalMethodError;
 pub use interceptor::InterceptorError;
 pub use interceptor_runtime::InterceptorRuntimeError;
@@ -35,4 +37,7 @@ pub enum OrchestratorError {
 
     #[error("internal orchestrator error: {message}")]
     Internal { message: String },
+
+    #[error(transparent)]
+    Config(#[from] ConfigError),
 }
