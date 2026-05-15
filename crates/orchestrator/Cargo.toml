@@ -10,3 +10,6 @@ thiserror = "2.0.18"
 
 actrpc_core = { path = "../core" }
 actrpc_transport = { path = "../transport" }
+
+[dev-dependencies]
+tokio = { version = "1.52.1", features = ["macros", "rt-multi-thread"] }
