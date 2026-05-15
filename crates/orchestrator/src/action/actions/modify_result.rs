@@ -1,5 +1,7 @@
 use crate::{
-    action::TypedActionHandler, error::ActionExecutionError, runtime::InFlightMessageState,
+    action::{ActionHandlerFuture, TypedActionHandler},
+    error::ActionExecutionError,
+    runtime::InFlightMessageState,
 };
 use actrpc_core::{
     DescribeParams,
@@ -35,42 +37,47 @@ impl ModifyResultHandler {
 }
 
 impl TypedActionHandler<ModifyResult> for ModifyResultHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<ModifyResult>,
-    ) -> Result<ResolvedAction<ModifyResult>, ActionExecutionError> {
-        let current = self.in_flight_message.snapshot().ok_or_else(|| {
-            ActionExecutionError::InvalidState {
-                message: "no in-flight message is currently set".to_owned(),
-            }
-        })?;
+    ) -> ActionHandlerFuture<'a, Result<ResolvedAction<ModifyResult>, ActionExecutionError>>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            let current = self.in_flight_message.snapshot().ok_or_else(|| {
+                ActionExecutionError::InvalidState {
+                    message: "no in-flight message is currently set".to_owned(),
+                }
+            })?;
 
-        let updated = match current {
-            JsonRpcMessage::Single(JsonRpcSingleMessage::Response(JsonRpcResponse::Success(
-                mut success,
-            ))) => {
-                success.result = action.params.result.clone();
-                JsonRpcMessage::Single(JsonRpcSingleMessage::Response(JsonRpcResponse::Success(
-                    success,
-                )))
-            }
-            _ => {
-                return Err(ActionExecutionError::InvalidParams {
-                    action: ModifyResult::action_kind(),
+            let updated = match current {
+                JsonRpcMessage::Single(JsonRpcSingleMessage::Response(
+                    JsonRpcResponse::Success(mut success),
+                )) => {
+                    success.result = action.params.result.clone();
+                    JsonRpcMessage::Single(JsonRpcSingleMessage::Response(
+                        JsonRpcResponse::Success(success),
+                    ))
+                }
+                _ => {
+                    return Err(ActionExecutionError::InvalidParams {
+                        action: ModifyResult::action_kind(),
+                    });
+                }
+            };
+
+            if !self.in_flight_message.replace_message(updated) {
+                return Err(ActionExecutionError::InvalidState {
+                    message: "no in-flight message is currently set".to_owned(),
                 });
             }
-        };
 
-        if !self.in_flight_message.replace_message(updated) {
-            return Err(ActionExecutionError::InvalidState {
-                message: "no in-flight message is currently set".to_owned(),
-            });
-        }
-
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(NoOk),
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(NoOk),
+            })
         })
     }
 }

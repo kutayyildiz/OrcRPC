@@ -1,5 +1,7 @@
 use crate::{
-    action::TypedActionHandler, error::ActionExecutionError, runtime::CurrentCallRejection,
+    action::{ActionHandlerFuture, TypedActionHandler},
+    error::ActionExecutionError,
+    runtime::CurrentCallRejection,
 };
 use actrpc_core::{
     DescribeParams,
@@ -35,16 +37,21 @@ impl RejectCallHandler {
 }
 
 impl TypedActionHandler<RejectCall> for RejectCallHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<RejectCall>,
-    ) -> Result<ResolvedAction<RejectCall>, ActionExecutionError> {
-        self.rejection.set(action.params.error.clone());
+    ) -> ActionHandlerFuture<'a, Result<ResolvedAction<RejectCall>, ActionExecutionError>>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            self.rejection.set(action.params.error.clone());
 
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(NoOk),
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(NoOk),
+            })
         })
     }
 }

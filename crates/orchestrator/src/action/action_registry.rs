@@ -19,6 +19,8 @@ impl ActionRegistry {
     pub fn register<A, H>(&mut self, handler: H) -> Result<(), OrchestratorError>
     where
         A: ActionSpec + Send + Sync + 'static,
+        A::Params: Send + 'static,
+        A::Result: Send + 'static,
         H: TypedActionHandler<A> + Send + Sync + 'static,
     {
         let kind = A::action_kind();

@@ -1,13 +1,15 @@
-use crate::{
-    action::{ActionHandler, TypedActionHandler},
-    error::ActionHandlerError,
+use crate::action::{ActionHandler, ActionHandlerFuture, TypedActionHandler};
+use actrpc_core::{
+    action::{ActionKind, ActionSpec, RequestedActionRecord, ResolvedActionRecord},
+    interception::InterceptionRequest,
 };
-use actrpc_core::action::{ActionKind, ActionSpec};
 use std::marker::PhantomData;
 
 pub struct RegisteredActionHandler<A, H>
 where
     A: ActionSpec,
+    A::Params: Send + 'static,
+    A::Result: Send + 'static,
     H: TypedActionHandler<A>,
 {
     inner: H,
@@ -17,6 +19,8 @@ where
 impl<A, H> RegisteredActionHandler<A, H>
 where
     A: ActionSpec,
+    A::Params: Send + 'static,
+    A::Result: Send + 'static,
     H: TypedActionHandler<A>,
 {
     pub fn new(inner: H) -> Self {
@@ -30,26 +34,33 @@ where
 impl<A, H> ActionHandler for RegisteredActionHandler<A, H>
 where
     A: ActionSpec + Send + Sync + 'static,
+    A::Params: Send + 'static,
+    A::Result: Send + 'static,
     H: TypedActionHandler<A> + Send + Sync + 'static,
 {
     fn kind(&self) -> ActionKind {
         A::action_kind()
     }
 
-    fn handle(
-        &self,
-        request: &actrpc_core::interception::InterceptionRequest,
-        action: actrpc_core::action::RequestedActionRecord,
-    ) -> Result<actrpc_core::action::ResolvedActionRecord, ActionHandlerError> {
-        let typed_action = action.try_into()?;
-        let resolved = self.inner.handle_typed(request, typed_action)?;
-        let record: actrpc_core::action::ResolvedActionRecord =
-            resolved.try_into().map_err(map_serde_serialize_err)?;
+    fn handle<'a>(
+        &'a self,
+        request: &'a InterceptionRequest,
+        action: RequestedActionRecord,
+    ) -> ActionHandlerFuture<'a>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            let typed_action = action.try_into()?;
+            let resolved = self.inner.handle_typed(request, typed_action).await?;
+            let record: ResolvedActionRecord =
+                resolved.try_into().map_err(map_serde_serialize_err)?;
 
-        Ok(record)
+            Ok(record)
+        })
     }
 }
 
-fn map_serde_serialize_err(e: serde_json::Error) -> actrpc_core::error::CodecError {
-    actrpc_core::error::CodecError::Serialize(e.to_string())
+fn map_serde_serialize_err(error: serde_json::Error) -> actrpc_core::error::CodecError {
+    actrpc_core::error::CodecError::Serialize(error.to_string())
 }

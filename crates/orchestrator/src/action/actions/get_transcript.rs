@@ -1,5 +1,7 @@
 use crate::{
-    action::TypedActionHandler, error::ActionExecutionError, runtime::TranscriptState,
+    action::{ActionHandlerFuture, TypedActionHandler},
+    error::ActionExecutionError,
+    runtime::TranscriptState,
     transcript::TranscriptEntryView,
 };
 use actrpc_core::{
@@ -28,16 +30,21 @@ impl GetTranscriptHandler {
 }
 
 impl TypedActionHandler<GetTranscript> for GetTranscriptHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<GetTranscript>,
-    ) -> Result<ResolvedAction<GetTranscript>, ActionExecutionError> {
-        let entries = self.transcript.snapshot();
+    ) -> ActionHandlerFuture<'a, Result<ResolvedAction<GetTranscript>, ActionExecutionError>>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            let entries = self.transcript.snapshot();
 
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(entries),
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(entries),
+            })
         })
     }
 }

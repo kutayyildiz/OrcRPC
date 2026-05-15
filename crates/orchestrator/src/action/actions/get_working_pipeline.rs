@@ -1,6 +1,7 @@
 use crate::{
-    action::TypedActionHandler, error::ActionExecutionError,
-    runtime::interceptor::WorkingInterceptorPipeline,
+    action::{ActionHandlerFuture, TypedActionHandler},
+    error::ActionExecutionError,
+    interceptor::WorkingInterceptorPipeline,
 };
 use actrpc_core::{
     DescribeValue,
@@ -35,21 +36,26 @@ impl GetWorkingPipelineHandler {
 }
 
 impl TypedActionHandler<GetWorkingPipeline> for GetWorkingPipelineHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<GetWorkingPipeline>,
-    ) -> Result<ResolvedAction<GetWorkingPipeline>, ActionExecutionError> {
-        let entries = self
-            .pipeline
-            .snapshot()
-            .into_iter()
-            .map(|name| GetWorkingPipelineEntry { name })
-            .collect();
+    ) -> ActionHandlerFuture<'a, Result<ResolvedAction<GetWorkingPipeline>, ActionExecutionError>>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            let entries = self
+                .pipeline
+                .snapshot()
+                .into_iter()
+                .map(|name| GetWorkingPipelineEntry { name })
+                .collect();
 
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(entries),
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(entries),
+            })
         })
     }
 }

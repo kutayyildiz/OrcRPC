@@ -1,6 +1,7 @@
 use crate::{
-    action::TypedActionHandler, error::ActionExecutionError,
-    runtime::interceptor::WorkingInterceptorPipeline,
+    action::{ActionHandlerFuture, TypedActionHandler},
+    error::ActionExecutionError,
+    interceptor::WorkingInterceptorPipeline,
 };
 use actrpc_core::{
     DescribeParams,
@@ -8,8 +9,7 @@ use actrpc_core::{
     interception::InterceptionRequest,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 #[derive(Debug, Clone, Serialize, Deserialize, DescribeParams)]
 pub struct ExcludeInterceptorsParams {
@@ -36,39 +36,44 @@ impl ExcludeInterceptorsHandler {
 }
 
 impl TypedActionHandler<ExcludeInterceptors> for ExcludeInterceptorsHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<ExcludeInterceptors>,
-    ) -> Result<ResolvedAction<ExcludeInterceptors>, ActionExecutionError> {
-        if action.params.names.is_empty() {
-            return Err(ActionExecutionError::InvalidParams {
-                action: ExcludeInterceptors::action_kind(),
-            });
-        }
-
-        let mut seen = HashSet::new();
-        let mut names = Vec::new();
-
-        for name in &action.params.names {
-            let trimmed = name.trim();
-
-            if trimmed.is_empty() {
+    ) -> ActionHandlerFuture<'a, Result<ResolvedAction<ExcludeInterceptors>, ActionExecutionError>>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            if action.params.names.is_empty() {
                 return Err(ActionExecutionError::InvalidParams {
                     action: ExcludeInterceptors::action_kind(),
                 });
             }
 
-            if seen.insert(trimmed.to_owned()) {
-                names.push(trimmed.to_owned());
+            let mut seen = HashSet::new();
+            let mut names = Vec::new();
+
+            for name in &action.params.names {
+                let trimmed = name.trim();
+
+                if trimmed.is_empty() {
+                    return Err(ActionExecutionError::InvalidParams {
+                        action: ExcludeInterceptors::action_kind(),
+                    });
+                }
+
+                if seen.insert(trimmed.to_owned()) {
+                    names.push(trimmed.to_owned());
+                }
             }
-        }
 
-        self.pipeline.exclude_named(&names);
+            self.pipeline.exclude_named(&names);
 
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(NoOk),
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(NoOk),
+            })
         })
     }
 }

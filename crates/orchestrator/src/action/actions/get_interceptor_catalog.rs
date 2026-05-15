@@ -1,7 +1,7 @@
 use crate::{
-    action::TypedActionHandler,
+    action::{ActionHandlerFuture, TypedActionHandler},
     error::ActionExecutionError,
-    runtime::interceptor::{InterceptorCatalog, InterceptorPolicy},
+    interceptor::{InterceptorCatalog, InterceptorPolicy},
 };
 use actrpc_core::{
     DescribeValue,
@@ -37,24 +37,29 @@ impl GetInterceptorCatalogHandler {
 }
 
 impl TypedActionHandler<GetInterceptorCatalog> for GetInterceptorCatalogHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<GetInterceptorCatalog>,
-    ) -> Result<ResolvedAction<GetInterceptorCatalog>, ActionExecutionError> {
-        let entries = self
-            .catalog
-            .entries()
-            .into_iter()
-            .map(|entry| GetInterceptorCatalogEntry {
-                name: entry.name,
-                policy: entry.policy,
-            })
-            .collect();
+    ) -> ActionHandlerFuture<'a, Result<ResolvedAction<GetInterceptorCatalog>, ActionExecutionError>>
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            let entries = self
+                .catalog
+                .entries()
+                .into_iter()
+                .map(|entry| GetInterceptorCatalogEntry {
+                    name: entry.name,
+                    policy: entry.policy,
+                })
+                .collect();
 
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(entries),
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(entries),
+            })
         })
     }
 }

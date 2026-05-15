@@ -1,7 +1,7 @@
 use crate::{
-    action::TypedActionHandler,
+    action::{ActionHandlerFuture, TypedActionHandler},
     error::ActionExecutionError,
-    runtime::interceptor::{InterceptorCatalog, InterceptorPolicy, WorkingInterceptorPipeline},
+    interceptor::{InterceptorCatalog, InterceptorPolicy, WorkingInterceptorPipeline},
 };
 use actrpc_core::{
     DescribeValue,
@@ -41,25 +41,33 @@ impl GetWorkingInterceptorCatalogHandler {
 }
 
 impl TypedActionHandler<GetWorkingInterceptorCatalog> for GetWorkingInterceptorCatalogHandler {
-    fn handle_typed(
-        &self,
-        _request: &InterceptionRequest,
+    fn handle_typed<'a>(
+        &'a self,
+        _request: &'a InterceptionRequest,
         action: RequestedAction<GetWorkingInterceptorCatalog>,
-    ) -> Result<ResolvedAction<GetWorkingInterceptorCatalog>, ActionExecutionError> {
-        let names = self.pipeline.snapshot();
-        let entries = self.catalog.entries_for_names(&names)?;
+    ) -> ActionHandlerFuture<
+        'a,
+        Result<ResolvedAction<GetWorkingInterceptorCatalog>, ActionExecutionError>,
+    >
+    where
+        Self: 'a,
+    {
+        Box::pin(async move {
+            let names = self.pipeline.snapshot();
+            let entries = self.catalog.entries_for_names(&names)?;
 
-        let entries = entries
-            .into_iter()
-            .map(|entry| GetWorkingInterceptorCatalogEntry {
-                name: entry.name,
-                policy: entry.policy,
+            let entries = entries
+                .into_iter()
+                .map(|entry| GetWorkingInterceptorCatalogEntry {
+                    name: entry.name,
+                    policy: entry.policy,
+                })
+                .collect();
+
+            Ok(ResolvedAction {
+                params: action.params,
+                result: Ok(entries),
             })
-            .collect();
-
-        Ok(ResolvedAction {
-            params: action.params,
-            result: Ok(entries),
         })
     }
 }
