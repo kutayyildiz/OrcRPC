@@ -17,4 +17,13 @@ pub enum ActionError {
 
     #[error("duplicate action registration for kind {kind}")]
     DuplicateRegistration { kind: ActionKind },
+
+    #[error(
+        "interceptor {interceptor} is not allowed to execute action {action} during phase {phase}"
+    )]
+    ForbiddenByPolicy {
+        interceptor: String,
+        action: ActionKind,
+        phase: InterceptionPhase,
+    },
 }
