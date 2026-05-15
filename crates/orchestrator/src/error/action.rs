@@ -1,5 +1,5 @@
 use crate::error::ActionHandlerError;
-use actrpc_core::action::ActionKind;
+use actrpc_core::{action::ActionKind, interception::InterceptionPhase};
 
 #[non_exhaustive]
 #[derive(Debug, thiserror::Error)]
@@ -10,7 +10,7 @@ pub enum ActionError {
     #[error("action handler failed for interceptor {interceptor}, action {action}: {source}")]
     HandlerFailed {
         interceptor: String,
-        action: actrpc_core::action::ActionKind,
+        action: ActionKind,
         #[source]
         source: ActionHandlerError,
     },
