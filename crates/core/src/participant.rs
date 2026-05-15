@@ -4,6 +4,7 @@ use strum::Display;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Display)]
 #[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 pub enum ParticipantType {
     User,
     Interceptor,
