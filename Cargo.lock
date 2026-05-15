@@ -3,20 +3,10 @@
 version = 4
 
 [[package]]
-name = "actrpc-interceptor"
+name = "actrpc-core"
 version = "0.1.0"
 dependencies = [
- "actrpc_core",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "actrpc_core"
-version = "0.1.0"
-dependencies = [
- "actrpc_core_macros",
+ "actrpc-core-macros",
  "serde",
  "serde_json",
  "strum",
@@ -24,10 +14,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "actrpc_core_macros"
+name = "actrpc-core-macros"
 version = "0.1.0"
 dependencies = [
- "actrpc_core",
+ "actrpc-core",
  "proc-macro2",
  "quote",
  "serde",
@@ -37,11 +27,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "actrpc_orchestrator"
+name = "actrpc-interceptor"
 version = "0.1.0"
 dependencies = [
- "actrpc_core",
- "actrpc_transport",
+ "actrpc-core",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "actrpc-orchestrator"
+version = "0.1.0"
+dependencies = [
+ "actrpc-core",
+ "actrpc-transport",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -51,10 +51,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "actrpc_transport"
+name = "actrpc-transport"
 version = "0.1.0"
 dependencies = [
- "actrpc_core",
+ "actrpc-core",
  "async-trait",
  "futures-util",
  "interprocess",

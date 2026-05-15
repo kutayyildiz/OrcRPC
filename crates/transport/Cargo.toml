@@ -1,5 +1,5 @@
 [package]
-name = "actrpc_transport"
+name = "actrpc-transport"
 version = "0.1.0"
 edition = "2024"
 
@@ -28,4 +28,4 @@ tokio-tungstenite = { version = "0.29.0", features = [
 ] }
 futures-util = "0.3.32"
 
-actrpc_core = { path = "../core" }
+actrpc-core = { path = "../core" }

@@ -1,5 +1,5 @@
 [package]
-name = "actrpc_orchestrator"
+name = "actrpc-orchestrator"
 version = "0.1.0"
 edition = "2024"
 
@@ -10,8 +10,8 @@ serde_yaml = "0.8.7"
 toml = "1.1.2"
 thiserror = "2.0.18"
 
-actrpc_core = { path = "../core" }
-actrpc_transport = { path = "../transport" }
+actrpc-core = { path = "../core" }
+actrpc-transport = { path = "../transport" }
 
 [dev-dependencies]
 tokio = { version = "1.52.1", features = ["macros", "rt-multi-thread"] }
